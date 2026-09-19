@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="hero">
+  <div class="leaf">🌿</div>
+  <h1>What's wrong with my plant?</h1>
+  <p>Take a photo of a sick leaf and find out what disease it has — and what to do about it.</p>
+</div>
+
+<div class="upload">
+  <form method="post" action="{{ url_for('diagnose') }}" enctype="multipart/form-data" id="f">
+    <label class="drop" for="img">
+      <div class="ic">📷</div>
+      <div class="t">Tap to take or choose a photo</div>
+      <div class="s">JPG, PNG or WEBP</div>
+    </label>
+    <input type="file" name="image" id="img" accept="image/*" capture="environment">
+    <img id="preview" alt="">
+    <div style="margin-top:16px"><button class="btn full" type="submit">Diagnose this leaf</button></div>
+  </form>
+</div>
+
+<div class="tips">
+  <h3>For the best result</h3>
+  <ul>
+    <li>Fill the frame with ONE leaf, not the whole plant.</li>
+    <li>Use daylight — avoid shadows and flash glare.</li>
+    <li>Photograph the side that shows the spots clearly.</li>
+    <li>Keep the background plain if you can.</li>
+  </ul>
+</div>
+
+<script>
+// show a preview so people know the photo actually got picked up
+const inp=document.getElementById('img'), pv=document.getElementById('preview');
+inp.addEventListener('change',()=>{
+  if(inp.files && inp.files[0]){
+    pv.src=URL.createObjectURL(inp.files[0]);
+    pv.style.display='block';
+  }
+});
+</script>
+{% endblock %}

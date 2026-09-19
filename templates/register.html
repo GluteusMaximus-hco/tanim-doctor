@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="card-form">
+  <h1>Create an account</h1>
+  <p style="color:var(--muted);font-size:.9rem">So you can keep a history of your scans.</p>
+  <form method="post">
+    <label>Name</label><input type="text" name="name">
+    <label>Email</label><input type="email" name="email">
+    <label>Password</label><input type="password" name="password" placeholder="6+ characters">
+    <div style="margin-top:20px"><button class="btn full">Sign up</button></div>
+  </form>
+  <div class="center">Already have one? <a href="{{ url_for('login') }}">Log in</a></div>
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+# === the big stuff that should NEVER go to github ===
+# the dataset is several GB — anyone can download it from kaggle themselves
+data/
+
+# the trained model — people retrain it with train.py
+model/*.keras
+model/*.h5
+model/labels.json
+
+# photos people upload while testing
+static/uploads/*
+!static/uploads/.gitkeep
+
+# === python junk ===
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.Python
+*.egg-info/
+
+# === local config / secrets ===
+# in case you move the mysql password out of app.py later
+.env
+*.db
+*.sqlite3
+
+# === editor + os noise ===
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+desktop.ini
+.DS_Store

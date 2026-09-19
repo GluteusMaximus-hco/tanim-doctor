@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Diagnosis · Tanim Doctor{% endblock %}
+{% block body %}
+<div class="res-top">
+  <div class="res-photo"><img src="{{ url_for('static', filename='uploads/' ~ r.image) }}" alt=""></div>
+  <div class="verdict {{ 'healthy' if r.healthy }}">
+    <div class="plant-name">{{ r.plant }}</div>
+    <h1>{{ r.disease }}</h1>
+    <div class="conf-row">
+      <div class="conf-bar"><i style="width: {{ r.confidence }}%"></i></div>
+      <div class="conf-num">{{ r.confidence }}%</div>
+    </div>
+    <div class="conf-note">
+      {% if r.confidence >= 85 %}The model is quite sure about this one.
+      {% elif r.confidence >= 60 %}Fairly confident — worth double-checking.
+      {% else %}Not very sure. Try a clearer, closer photo of the leaf.{% endif %}
+    </div>
+    <div class="about">{{ r.about }}</div>
+  </div>
+</div>
+
+<div class="block">
+  <h2>🩺 What to do now</h2>
+  <ol>{% for step in r.treat %}<li>{{ step }}</li>{% endfor %}</ol>
+</div>
+
+<div class="block">
+  <h2>🛡️ Stopping it coming back</h2>
+  <ul>{% for step in r.prevent %}<li>{{ step }}</li>{% endfor %}</ul>
+</div>
+
+{% if r.others %}
+<div class="block">
+  <h2>Other possibilities</h2>
+  {% for o in r.others %}
+  <div class="alt"><span>{{ o.plant }} — {{ o.disease }}</span><span class="c">{{ o.confidence }}%</span></div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="disclaimer">
+  ⚠️ This is an automated guess from a photo, not a certainty. For a serious outbreak or a crop you depend on, confirm with your local agriculture office or an agronomist before spending money on treatment.
+</div>
+
+<div style="margin-top:22px;text-align:center">
+  <a href="{{ url_for('index') }}" class="btn">Scan another leaf</a>
+</div>
+{% endblock %}
