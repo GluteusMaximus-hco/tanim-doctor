@@ -9,7 +9,21 @@
 <div class="upload">
   <form method="post" action="{{ url_for('diagnose') }}" enctype="multipart/form-data" id="f">
     <label class="drop" for="img">
-      <span class="ic">📷</span>
+      <svg class="ic" viewBox="0 0 64 48" fill="none" aria-hidden="true">
+        <!-- camera body, drawn as strokes so it picks up whatever color the theme is -->
+        <rect x="2" y="10" width="60" height="36" rx="6" stroke="currentColor" stroke-width="1.6"/>
+        <!-- the little hump on top where the viewfinder sits -->
+        <path d="M20 10 L24.5 3 H39.5 L44 10" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+        <!-- lens. two rings + a highlight so it reads as glass, not a donut -->
+        <circle cx="32" cy="28" r="12" stroke="currentColor" stroke-width="1.6"/>
+        <circle cx="32" cy="28" r="6.5" stroke="currentColor" stroke-width="1.2" opacity=".75"/>
+        <circle cx="27.5" cy="23.5" r="1.8" fill="currentColor" opacity=".5"/>
+        <!-- flash bulb -->
+        <circle cx="52" cy="17" r="2" fill="currentColor" opacity=".6"/>
+        <!-- corner brackets, like a focus reticle framing the shot -->
+        <path d="M8 18 V15 H11" stroke="currentColor" stroke-width="1.4" opacity=".4" stroke-linecap="round"/>
+        <path d="M56 38 V41 H53" stroke="currentColor" stroke-width="1.4" opacity=".4" stroke-linecap="round"/>
+      </svg>
       <div class="t">Tap to take or choose a photo</div>
       <div class="s">JPG, PNG or WEBP</div>
     </label>
@@ -20,7 +34,14 @@
 </div>
 
 <div class="tips">
-  <h3>📸 For the best result</h3>
+  <h3>
+    <svg class="tip-ic" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <rect x="1.5" y="5" width="17" height="12.5" rx="2.5" stroke="currentColor" stroke-width="1.3"/>
+      <path d="M6.5 5 L8 2.5 H12 L13.5 5" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+      <circle cx="10" cy="11.2" r="3.8" stroke="currentColor" stroke-width="1.3"/>
+    </svg>
+    For the best result
+  </h3>
   <ul>
     <li>Fill the frame with ONE leaf, not the whole plant.</li>
     <li>Use daylight. Avoid harsh shadows and flash glare.</li>

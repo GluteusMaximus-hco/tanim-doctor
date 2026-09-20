@@ -124,10 +124,48 @@ nav .wrap{display:flex;align-items:center;gap:14px;height:64px}
 .btn:active{transform:translateY(0)}
 .btn.full{width:100%;text-align:center}
 
-/* ---------- flash ---------- */
-.flash{margin:18px 0;padding:13px 16px;border-radius:12px;font-size:.92rem;font-weight:500;border:1px solid transparent}
-.flash.ok{background:var(--bg-tint);color:var(--green);border-color:var(--line)}
-.flash.warn{background:var(--danger-bg);color:var(--danger);border-color:color-mix(in srgb,var(--danger) 25%,transparent)}
+/* ---------- flash toasts ----------
+   these sit in the top-right corner now instead of shoving the page down.
+   each one has an x, and they fade themselves out after a few seconds. */
+.toast-wrap{
+  position:fixed; top:78px; right:20px; z-index:50;
+  display:flex; flex-direction:column; gap:10px;
+  max-width:340px; width:calc(100% - 40px); pointer-events:none;
+}
+.flash{
+  pointer-events:auto;
+  display:flex; align-items:flex-start; gap:12px;
+  padding:14px 14px 14px 16px; border-radius:13px;
+  font-size:.91rem; font-weight:500; border:1px solid transparent;
+  background:var(--card); box-shadow:var(--shadow-lg);
+  backdrop-filter:blur(10px);
+  animation:toastIn .32s cubic-bezier(.2,.9,.25,1);
+}
+@keyframes toastIn{from{opacity:0;transform:translateX(24px) scale(.97)}}
+.flash.leaving{animation:toastOut .26s ease forwards}
+@keyframes toastOut{to{opacity:0;transform:translateX(24px) scale(.97)}}
+
+.flash .msg{flex:1;line-height:1.45}
+.flash .x{
+  background:none;border:none;cursor:pointer;color:inherit;opacity:.55;
+  font-size:1.05rem;line-height:1;padding:2px 4px;border-radius:6px;
+  transition:.15s;flex-shrink:0;font-family:inherit;
+}
+.flash .x:hover{opacity:1;background:color-mix(in srgb,currentColor 14%,transparent)}
+
+/* colored strip down the left edge so you read the severity instantly */
+.flash::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:13px 0 0 13px;
+}
+.flash{position:relative;overflow:hidden}
+.flash.ok{color:var(--green);border-color:color-mix(in srgb,var(--green) 28%,var(--line))}
+.flash.ok::before{background:var(--green)}
+.flash.warn{color:var(--danger);border-color:color-mix(in srgb,var(--danger) 28%,var(--line))}
+.flash.warn::before{background:var(--danger)}
+
+@media(max-width:700px){
+  .toast-wrap{top:72px;right:12px;left:12px;width:auto;max-width:none}
+}
 
 main{padding:34px 0 80px}
 
@@ -151,7 +189,21 @@ main{padding:34px 0 80px}
   cursor:pointer;transition:.2s;background:var(--card-2);display:block;position:relative;overflow:hidden;
 }
 .drop:hover{border-color:var(--green);background:var(--bg-tint)}
-.drop .ic{font-size:2.4rem;display:block}
+/* the camera icon is an inline svg now, not an emoji, so it takes the theme
+   color and sits quietly in the background instead of shouting in full color */
+.drop .ic{
+  width:76px;height:auto;display:block;margin:0 auto;
+  color:var(--muted);opacity:.55;
+  transition:color .2s, opacity .2s, transform .25s;
+}
+.drop:hover .ic{color:var(--green);opacity:1;transform:translateY(-2px) scale(1.04)}
+/* the lens rings get a slow pulse so the drop zone feels alive, not dead */
+.drop .ic circle:nth-of-type(2){
+  transform-origin:center; animation:lensPulse 3.5s ease-in-out infinite;
+}
+@keyframes lensPulse{0%,100%{opacity:.75}50%{opacity:.3}}
+
+.tip-ic{width:17px;height:17px;color:var(--green);flex-shrink:0}
 .drop .t{font-weight:650;margin-top:10px;color:var(--ink)}
 .drop .s{color:var(--muted);font-size:.85rem;margin-top:4px}
 #preview{max-width:100%;border-radius:12px;margin-top:16px;display:none;box-shadow:var(--shadow)}
