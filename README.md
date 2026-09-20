@@ -65,13 +65,17 @@ Start MySQL, then run the app. It creates its own database and tables on first r
 python app.py
 ```
 
-Open http://localhost:5000.
+Open http://127.0.0.1:5000.
 
 If you are low on patience, drop `EPOCHS` from 8 to 3. You lose a few percent of accuracy and save most of the time.
 
 ## Honest limitations
 
-**It will confidently misdiagnose plants it has never seen.** The model knows 38 classes. Show it a mango leaf and it will still return an answer, because softmax always sums to 1 and something has to win. It does not know what it does not know. This is why the app always shows a confidence number and alternatives instead of a single verdict.
+**It does not know what it does not know.** The model knows 38 classes. Show it a mango leaf, a poster, or a video game screenshot and it will still pick one, because softmax always sums to 1 and something has to win. I tested this by feeding it a screenshot of a game and it came back with tomato late blight and a four step spraying plan.
+
+The app now refuses to answer when it is not sure. A diagnosis only shows if the top prediction clears 80% and beats second place by at least 25 points. Otherwise you get an "I'm not sure about this one" screen with no treatment advice at all. Both of those junk photos are correctly rejected now.
+
+This helps but does not solve it. A real mango leaf that happens to resemble something in the training set can still clear the bar and be wrong. The proper fix is retraining with a 39th "not a leaf I recognise" class.
 
 **Dataset photos are cleaner than real ones.** Every PlantVillage image is a single leaf on a plain background. Field photos have soil, shadows, multiple leaves, weird angles. Expect lower confidence on real photos than the 96.4% suggests.
 
@@ -83,7 +87,7 @@ If you are low on patience, drop `EPOCHS` from 8 to 3. You lose a few percent of
 
 ## Things I want to add
 
-- **Rejection threshold.** If the top prediction is below roughly 60%, say "I am not sure, try a clearer photo" instead of guessing. This is the fix that matters most.
+- **An "unknown" class.** Retrain with a 39th class fed on random non-leaf images, so the model learns what a leaf is not instead of relying on a confidence cutoff.
 - **Filipino translations** in `knowledge.py`. The structure already supports it, the text just needs writing.
 - **Track a plant over time.** Photograph the same plant weekly and see whether treatment is working. This is where accounts would finally earn their place, since right now they only store history.
 - **Report wrong diagnoses.** Let users flag bad results, collect them, retrain on real field photos instead of clean dataset ones.
