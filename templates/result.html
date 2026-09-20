@@ -12,7 +12,7 @@
     </div>
     <div class="conf-note">
       {% if r.confidence >= 85 %}The model is quite sure about this one.
-      {% elif r.confidence >= 60 %}Fairly confident — worth double-checking.
+      {% elif r.confidence >= 60 %}Fairly confident, worth double-checking.
       {% else %}Not very sure. Try a clearer, closer photo of the leaf.{% endif %}
     </div>
     <div class="about">{{ r.about }}</div>
@@ -33,7 +33,7 @@
 <div class="block">
   <h2>Other possibilities</h2>
   {% for o in r.others %}
-  <div class="alt"><span>{{ o.plant }} — {{ o.disease }}</span><span class="c">{{ o.confidence }}%</span></div>
+  <div class="alt"><span>{{ o.plant }} · {{ o.disease }}</span><span class="c">{{ o.confidence }}%</span></div>
   {% endfor %}
 </div>
 {% endif %}
