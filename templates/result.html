@@ -20,12 +20,28 @@
 </div>
 
 <div class="block">
-  <h2>🩺 What to do now</h2>
+  <h2>
+    <svg class="h-ic" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M6 3v6a5 5 0 0 0 10 0V3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M4 3h3M15 3h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M11 14v2a5 5 0 0 0 10 0v-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="21" cy="12" r="2.2" stroke="currentColor" stroke-width="1.5"/>
+    </svg>
+    What to do now
+  </h2>
   <ol>{% for step in r.treat %}<li>{{ step }}</li>{% endfor %}</ol>
 </div>
 
 <div class="block">
-  <h2>🛡️ Stopping it coming back</h2>
+  <h2>
+    <svg class="h-ic" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 2.5 4.5 5.5v6c0 4.7 3.1 8.6 7.5 10 4.4-1.4 7.5-5.3 7.5-10v-6L12 2.5Z"
+            stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="m8.8 11.8 2.3 2.3 4.2-4.4" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Stopping it coming back
+  </h2>
   <ul>{% for step in r.prevent %}<li>{{ step }}</li>{% endfor %}</ul>
 </div>
 
@@ -39,7 +55,12 @@
 {% endif %}
 
 <div class="disclaimer">
-  ⚠️ This is an automated guess from a photo, not a certainty. For a serious outbreak or a crop you depend on, confirm with your local agriculture office or an agronomist before spending money on treatment.
+  <svg class="warn-ic" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M12 3.5 2.5 20h19L12 3.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M12 9.5v4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    <circle cx="12" cy="16.8" r="1" fill="currentColor"/>
+  </svg>
+  This is an automated guess from a photo, not a certainty. For a serious outbreak or a crop you depend on, confirm with your local agriculture office or an agronomist before spending money on treatment.
 </div>
 
 <div style="margin-top:22px;text-align:center">

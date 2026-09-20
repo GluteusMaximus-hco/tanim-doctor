@@ -20,7 +20,13 @@
 <body>
 <nav><div class="wrap">
   <a href="{{ url_for('index') }}" class="logo">
-    <span class="mark">🌿</span><span class="t1">Tanim</span><span class="t2">Doctor</span>
+    <span class="mark">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 21V9.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        <path d="M12 12.5c0-3.3 2.6-6 6.5-6.4.3 3.9-2.2 6.8-6.5 6.4Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M12 16.5c0-2.8-2.2-5.1-5.5-5.4-.3 3.3 1.9 5.8 5.5 5.4Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+      </svg>
+    </span><span class="t1">Tanim</span><span class="t2">Doctor</span>
   </a>
   <div class="nav-links">
     {% if me %}
@@ -30,7 +36,17 @@
       <a href="{{ url_for('login') }}">Log in</a>
       <a href="{{ url_for('register') }}">Sign up</a>
     {% endif %}
-    <button class="theme-btn" id="themeBtn" title="Switch theme" aria-label="Switch theme">🌙</button>
+    <button class="theme-btn" id="themeBtn" title="Switch theme" aria-label="Switch theme">
+      <svg class="ico-moon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.6 8.6 0 1 0 10.2 10.2Z"
+              stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      </svg>
+      <svg class="ico-sun" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M12 2.6v2.2M12 19.2v2.2M21.4 12h-2.2M4.8 12H2.6M18.6 5.4l-1.6 1.6M7 17l-1.6 1.6M18.6 18.6 17 17M7 7 5.4 5.4"
+              stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </button>
   </div>
 </div></nav>
 {% with msgs = get_flashed_messages(with_categories=true) %}
@@ -58,7 +74,7 @@
     if(set) return set === 'dark';
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   }
-  function paintIcon(){ btn.textContent = currentlyDark() ? '☀️' : '🌙'; }
+  function paintIcon(){ btn.classList.toggle('is-dark', currentlyDark()); }
 
   btn.addEventListener('click', function(){
     var next = currentlyDark() ? 'light' : 'dark';

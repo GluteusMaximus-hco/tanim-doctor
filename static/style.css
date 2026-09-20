@@ -92,11 +92,13 @@ nav{
 nav .wrap{display:flex;align-items:center;gap:14px;height:64px}
 .logo{font-weight:800;font-size:1.22rem;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
 .logo .mark{
-  width:28px;height:28px;border-radius:9px;
+  width:30px;height:30px;border-radius:9px;
   background:linear-gradient(135deg,var(--green-bright),var(--green));
-  display:grid;place-items:center;font-size:.95rem;
+  display:grid;place-items:center;
   box-shadow:0 4px 12px -4px var(--green);
+  color:#fff;
 }
+.logo .mark svg{width:18px;height:18px;display:block}
 .logo .t1{color:var(--green)}
 .logo .t2{color:var(--ink)}
 .nav-links{margin-left:auto;display:flex;gap:4px;align-items:center}
@@ -110,6 +112,13 @@ nav .wrap{display:flex;align-items:center;gap:14px;height:64px}
   display:grid;place-items:center;transition:.16s;margin-left:4px;
 }
 .theme-btn:hover{border-color:var(--green);transform:translateY(-1px)}
+.theme-btn svg{width:17px;height:17px;display:block;position:absolute;transition:opacity .2s, transform .3s}
+.theme-btn{position:relative}
+/* show moon in light mode (click to go dark), sun in dark mode (click to go light) */
+.theme-btn .ico-sun{opacity:0;transform:rotate(-70deg) scale(.6)}
+.theme-btn .ico-moon{opacity:1;transform:rotate(0) scale(1)}
+.theme-btn.is-dark .ico-sun{opacity:1;transform:rotate(0) scale(1)}
+.theme-btn.is-dark .ico-moon{opacity:0;transform:rotate(70deg) scale(.6)}
 
 /* ---------- buttons ---------- */
 .btn{
@@ -172,9 +181,10 @@ main{padding:34px 0 80px}
 /* ---------- hero ---------- */
 .hero{text-align:center;margin-bottom:34px}
 .hero .leaf{
-  font-size:3rem;display:inline-block;
+  display:inline-block; color:var(--green);
   animation:sway 5s ease-in-out infinite;
 }
+.hero .leaf svg{width:52px;height:52px;display:block}
 @keyframes sway{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
 .hero h1{font-size:clamp(1.9rem,5.5vw,2.6rem);margin:10px 0;letter-spacing:-.03em;font-weight:800}
 .hero p{color:var(--muted);max-width:440px;margin:0 auto;font-size:1.02rem}
@@ -204,6 +214,13 @@ main{padding:34px 0 80px}
 @keyframes lensPulse{0%,100%{opacity:.75}50%{opacity:.3}}
 
 .tip-ic{width:17px;height:17px;color:var(--green);flex-shrink:0}
+
+/* section heading icons on the result page */
+.h-ic{width:19px;height:19px;color:var(--green);flex-shrink:0}
+
+/* the disclaimer triangle. sits inline with the text, inherits the amber */
+.disclaimer{display:flex;gap:11px;align-items:flex-start;line-height:1.5}
+.warn-ic{width:18px;height:18px;flex-shrink:0;margin-top:1px;color:inherit}
 .drop .t{font-weight:650;margin-top:10px;color:var(--ink)}
 .drop .s{color:var(--muted);font-size:.85rem;margin-top:4px}
 #preview{max-width:100%;border-radius:12px;margin-top:16px;display:none;box-shadow:var(--shadow)}
@@ -287,6 +304,7 @@ input:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px var(--gl
 .hist .m{color:var(--muted);font-size:.78rem;margin-top:3px}
 .empty{text-align:center;padding:70px 20px;color:var(--muted)}
 .empty .big{font-size:2.8rem;margin-bottom:10px}
+.empty .big-ic{width:54px;height:54px;color:var(--green);opacity:.5;display:block;margin:0 auto 14px}
 
 @media(max-width:700px){
   .res-top{grid-template-columns:1fr}
