@@ -33,11 +33,18 @@
     <button class="theme-btn" id="themeBtn" title="Switch theme" aria-label="Switch theme">🌙</button>
   </div>
 </div></nav>
-<div class="wrap">
-  {% with msgs = get_flashed_messages(with_categories=true) %}
-    {% for cat,m in msgs %}<div class="flash {{ cat }}">{{ m }}</div>{% endfor %}
-  {% endwith %}
-</div>
+{% with msgs = get_flashed_messages(with_categories=true) %}
+  {% if msgs %}
+  <div class="toast-wrap" id="toasts">
+    {% for cat,m in msgs %}
+      <div class="flash {{ cat }}">
+        <span class="msg">{{ m }}</span>
+        <button class="x" aria-label="Dismiss">&times;</button>
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endwith %}
 <main><div class="wrap">{% block body %}{% endblock %}</div></main>
 
 <script>
@@ -60,6 +67,26 @@
     paintIcon();
   });
   paintIcon();
+})();
+
+// toasts: click the x to kill one, and they auto-dismiss after 5s so they
+// don't just sit there forever blocking the corner
+(function(){
+  var wrap = document.getElementById('toasts');
+  if(!wrap) return;
+
+  function dismiss(el){
+    if(el.classList.contains('leaving')) return;
+    el.classList.add('leaving');
+    setTimeout(function(){ el.remove(); }, 260);
+  }
+
+  wrap.querySelectorAll('.flash').forEach(function(t){
+    t.querySelector('.x').addEventListener('click', function(){ dismiss(t); });
+    var timer = setTimeout(function(){ dismiss(t); }, 5000);
+    // hovering pauses the auto-dismiss, in case you're still reading it
+    t.addEventListener('mouseenter', function(){ clearTimeout(timer); });
+  });
 })();
 </script>
 </body>
