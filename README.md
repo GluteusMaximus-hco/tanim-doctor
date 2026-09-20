@@ -65,7 +65,7 @@ Start MySQL, then run the app. It creates its own database and tables on first r
 python app.py
 ```
 
-Open http://127.0.0.1:5000.
+Open your local host.
 
 If you are low on patience, drop `EPOCHS` from 8 to 3. You lose a few percent of accuracy and save most of the time.
 
