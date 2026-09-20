@@ -311,3 +311,174 @@ input:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px var(--gl
   .wrap{padding:0 16px}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+
+/* ---------- "I'm not sure" screen ----------
+   shown when the model didn't clear the confidence bar. deliberately looks
+   different from a real result: amber not green, no treatment steps, nothing
+   that could be mistaken for advice. */
+.unsure{
+  max-width:560px;margin:10px auto 0;text-align:center;
+  background:var(--card);border:1px solid var(--warn-line);border-radius:var(--radius);
+  padding:36px 30px;box-shadow:var(--shadow-lg);position:relative;overflow:hidden;
+}
+.unsure::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:4px;
+  background:linear-gradient(90deg,var(--warn-ink),#e0a03c);
+}
+.unsure-ic{width:52px;height:52px;color:var(--warn-ink);opacity:.8;margin-bottom:12px}
+.unsure h1{font-size:1.5rem;letter-spacing:-.02em;margin-bottom:10px}
+.unsure > p{color:var(--muted);font-size:.96rem;max-width:420px;margin:0 auto}
+
+.unsure-photo{margin:24px auto 0;max-width:300px;border-radius:13px;overflow:hidden;border:1px solid var(--line)}
+.unsure-photo img{width:100%;display:block;opacity:.85}
+
+.unsure-tips{
+  margin-top:24px;text-align:left;background:var(--card-2);
+  border:1px solid var(--line);border-radius:13px;padding:18px 20px;
+}
+.unsure-tips h3{font-size:.92rem;margin-bottom:9px}
+.unsure-tips li{color:var(--muted);font-size:.87rem;margin-left:18px;margin-bottom:6px}
+
+/* the raw numbers, tucked away. there if you're curious, not shoved at you */
+.raw{margin-top:20px;text-align:left;border-top:1px solid var(--line);padding-top:16px}
+.raw summary{
+  cursor:pointer;font-size:.87rem;color:var(--muted);font-weight:600;
+  list-style:none;padding:6px 0;transition:color .15s;
+}
+.raw summary::-webkit-details-marker{display:none}
+.raw summary::before{content:"\25B8 ";display:inline-block;transition:transform .2s}
+.raw[open] summary::before{transform:rotate(90deg)}
+.raw summary:hover{color:var(--ink)}
+.raw .alt{font-size:.88rem}
+.raw-note{margin-top:12px;font-size:.8rem;color:var(--muted);line-height:1.5}
+
+
+/* ---------- swaying grass ----------
+   sits fixed at the bottom behind everything. the trick is nth-child(odd/even):
+   odd blades run the sway animation normally, even blades run it reversed, so
+   neighbours always lean opposite ways. add a stagger on top of that and it
+   reads as wind moving across the row instead of one big block swinging. */
+.grass{
+  position:fixed; left:0; right:0; bottom:0; height:150px;
+  z-index:0; pointer-events:none; overflow:hidden;
+  /* fade the tips out so it melts into the page instead of being a hard band */
+  -webkit-mask-image:linear-gradient(to top, #000 55%, transparent 100%);
+          mask-image:linear-gradient(to top, #000 55%, transparent 100%);
+}
+.grass svg{width:100%;height:100%;display:block}
+.grass .b{
+  transform-origin:bottom center;
+  transform-box:fill-box;            /* pivot on the blade itself, not the whole svg */
+  animation:sway-blade 4.2s ease-in-out infinite;
+  will-change:transform;
+}
+/* two layers: short dense stuff behind, taller blades in front */
+.grass .back { fill:var(--green); opacity:.11; --bend:4deg }
+.grass .front{ fill:var(--green); opacity:.24; --bend:9deg }
+/* every other blade leans the other way */
+.grass .b:nth-child(odd){ animation-direction:alternate }
+.grass .b:nth-child(even){ animation-direction:alternate-reverse }
+
+/* stagger so the motion travels along the row */
+.grass .b:nth-child(4n+1){ animation-duration:4.2s; animation-delay:0s }
+.grass .b:nth-child(4n+2){ animation-duration:5.1s; animation-delay:-.6s }
+.grass .b:nth-child(4n+3){ animation-duration:3.7s; animation-delay:-1.2s }
+.grass .b:nth-child(4n+4){ animation-duration:4.7s; animation-delay:-1.8s }
+
+
+/* skewX, NOT rotate. the svg is stretched with preserveAspectRatio="none",
+   so rotate() gets squashed by the non-uniform scale and the blades look like
+   they're bobbing up and down. skewX shears purely sideways: the tip swings
+   left and right while the base stays planted, which is how grass actually bends. */
+@keyframes sway-blade{
+  from{ transform:skewX(calc(var(--bend, 7deg) * -1)) }
+  to  { transform:skewX(var(--bend, 7deg)) }
+}
+
+/* dark mode: brighter green but lower opacity, otherwise it glows too much */
+:root[data-theme="dark"] .grass .back { fill:var(--green-bright); opacity:.10 }
+:root[data-theme="dark"] .grass .front{ fill:var(--green-bright); opacity:.20 }
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .grass .back { fill:var(--green-bright); opacity:.10 }
+  :root:not([data-theme="light"]) .grass .front{ fill:var(--green-bright); opacity:.20 }
+}
+
+/* keep page content above the grass */
+/* keep real content above the grass/leaves layers.
+   NOTE: do NOT put .toast-wrap in here. it's position:fixed and setting
+   position:relative on it drags it out of its corner. it only needs z-index. */
+nav, main{ position:relative; z-index:1 }
+nav{ z-index:20 }
+.toast-wrap{ z-index:50 }
+
+@media(max-width:700px){ .grass{height:100px} }
+@media (prefers-reduced-motion:reduce){ .grass .b{animation:none} }
+
+
+/* ---------- falling leaves ----------
+   two animations stacked on each leaf: the OUTER span handles falling +
+   drifting sideways, the INNER svg handles tumbling. keeping them separate
+   means the spin doesn't fight the drift, which is what makes it look like
+   it's actually caught in air instead of sliding down a track. */
+.leaves{
+  position:fixed; inset:0; z-index:0;
+  pointer-events:none; overflow:hidden;
+}
+.lf{
+  position:absolute; top:-8%;
+  animation:leaf-fall linear infinite;
+  will-change:transform;
+}
+.lf svg{
+  display:block; width:100%; height:100%;
+  animation:leaf-spin ease-in-out infinite;
+}
+.lf svg path{ fill:var(--green); opacity:.40 }
+.lf svg .v{ fill:none; stroke:var(--bg); stroke-width:1.5; opacity:.65 }
+
+@keyframes leaf-fall{
+  0%  { transform:translate3d(0,0,0) }
+  25% { transform:translate3d(34px, 26vh, 0) }
+  50% { transform:translate3d(-18px, 52vh, 0) }
+  75% { transform:translate3d(28px, 78vh, 0) }
+  100%{ transform:translate3d(-8px, 116vh, 0) }
+}
+@keyframes leaf-spin{
+  0%  { transform:rotate(0deg) rotateY(0deg) }
+  50% { transform:rotate(180deg) rotateY(180deg) }
+  100%{ transform:rotate(360deg) rotateY(360deg) }
+}
+
+/* each leaf gets its own lane, size, speed and head start. the negative
+   delays mean the page loads mid-storm instead of with a bare screen. */
+.lf:nth-child(1) {left:4%;  width:28px;height:28px;animation-duration:17s;animation-delay:-2s}
+.lf:nth-child(2) {left:13%; width:38px;height:38px;animation-duration:22s;animation-delay:-9s}
+.lf:nth-child(3) {left:22%; width:23px;height:23px;animation-duration:14s;animation-delay:-5s}
+.lf:nth-child(4) {left:31%; width:33px;height:33px;animation-duration:19s;animation-delay:-13s}
+.lf:nth-child(5) {left:41%; width:26px;height:26px;animation-duration:24s;animation-delay:-3s}
+.lf:nth-child(6) {left:50%; width:41px;height:41px;animation-duration:16s;animation-delay:-11s}
+.lf:nth-child(7) {left:59%; width:25px;height:25px;animation-duration:21s;animation-delay:-7s}
+.lf:nth-child(8) {left:68%; width:35px;height:35px;animation-duration:18s;animation-delay:-15s}
+.lf:nth-child(9) {left:77%; width:30px;height:30px;animation-duration:25s;animation-delay:-1s}
+.lf:nth-child(10){left:85%; width:23px;height:23px;animation-duration:15s;animation-delay:-10s}
+.lf:nth-child(11){left:92%; width:36px;height:36px;animation-duration:20s;animation-delay:-6s}
+.lf:nth-child(12){left:97%; width:26px;height:26px;animation-duration:23s;animation-delay:-17s}
+
+/* spin speed varies too, otherwise they tumble in sync and it looks fake */
+.lf:nth-child(3n)   svg{ animation-duration:6s }
+.lf:nth-child(3n+1) svg{ animation-duration:9s }
+.lf:nth-child(3n+2) svg{ animation-duration:7.5s; animation-direction:reverse }
+
+:root[data-theme="dark"] .lf svg path{ fill:var(--green-bright); opacity:.32 }
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .lf svg path{ fill:var(--green-bright); opacity:.32 }
+}
+
+/* thin them out on phones, no point burning battery on 12 leaves */
+@media(max-width:700px){
+  .lf:nth-child(n+7){ display:none }
+}
+@media (prefers-reduced-motion:reduce){
+  .leaves{ display:none }
+}

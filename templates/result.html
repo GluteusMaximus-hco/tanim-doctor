@@ -1,6 +1,50 @@
 {% extends "base.html" %}
 {% block title %}Diagnosis · Tanim Doctor{% endblock %}
 {% block body %}
+
+{% if r.uncertain %}
+<div class="unsure">
+  <svg class="unsure-ic" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="12" cy="12" r="9.2" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M9.4 9.2a2.7 2.7 0 0 1 5.2.9c0 1.8-2.6 2.2-2.6 3.9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="12" cy="17.2" r="1" fill="currentColor"/>
+  </svg>
+  <h1>I'm not sure about this one</h1>
+  {% if r.why == 'low' %}
+  <p>Nothing matched strongly enough for me to give you a diagnosis. That usually means the photo isn't clear enough, or this isn't one of the 38 plant diseases I was trained on.</p>
+  {% else %}
+  <p>Two possibilities scored almost the same, so I'd just be guessing. A clearer photo usually breaks the tie.</p>
+  {% endif %}
+
+  <div class="unsure-photo">
+    <img src="{{ url_for('static', filename='uploads/' ~ r.image) }}" alt="">
+  </div>
+
+  <div class="unsure-tips">
+    <h3>Try again with</h3>
+    <ul>
+      <li>ONE leaf filling the frame, not a whole plant or a scene.</li>
+      <li>Daylight, no flash glare or deep shadow.</li>
+      <li>The side of the leaf that actually shows the spots.</li>
+      <li>A plain background if you can manage it.</li>
+    </ul>
+  </div>
+
+  <details class="raw">
+    <summary>What the model actually thought</summary>
+    <div class="alt"><span>{{ r.plant }} · {{ r.disease }}</span><span class="c">{{ r.confidence }}%</span></div>
+    {% for o in r.others %}
+    <div class="alt"><span>{{ o.plant }} · {{ o.disease }}</span><span class="c">{{ o.confidence }}%</span></div>
+    {% endfor %}
+    <p class="raw-note">I only show a diagnosis when the top result clears 80% and beats second place by 25 points. This one didn't, so I'm not going to pretend otherwise.</p>
+  </details>
+
+  <div style="margin-top:26px;text-align:center">
+    <a href="{{ url_for('index') }}" class="btn">Try another photo</a>
+  </div>
+</div>
+
+{% else %}
 <div class="res-top">
   <div class="res-photo"><img src="{{ url_for('static', filename='uploads/' ~ r.image) }}" alt=""></div>
   <div class="verdict {{ 'healthy' if r.healthy }}">
@@ -66,4 +110,5 @@
 <div style="margin-top:22px;text-align:center">
   <a href="{{ url_for('index') }}" class="btn">Scan another leaf</a>
 </div>
+{% endif %}
 {% endblock %}

@@ -26,6 +26,13 @@ LABELS_PATH = os.path.join(APP_DIR, "model", "labels.json")
 ALLOWED = {"png", "jpg", "jpeg", "webp"}
 IMG_SIZE = 224
 
+# --- how sure the model has to be before we'll actually call it a diagnosis ---
+# the model only knows 38 classes and softmax forces the probabilities to add up
+# to 1, so it ALWAYS returns something even for a photo of a dog. these two
+# numbers are what stop it confidently diagnosing things that aren't leaves.
+MIN_CONFIDENCE = 80.0   # below this we say "not sure" instead of guessing
+MIN_MARGIN     = 25.0   # top guess must beat 2nd place by this much, or it's a coin flip
+
 # ---------- MySQL settings — change these to match your XAMPP setup ----------
 DB = {
     "host": "localhost",
@@ -140,21 +147,38 @@ def diagnose():
     path = os.path.join(UPLOADS, secure_filename(fname))
     file.save(path)
 
-    # shrink big phone photos so everything stays fast
+    # shrink big phone photos so everything stays fast.
+    # this also doubles as a validity check: if PIL can't open it, the file
+    # isn't really an image (someone renamed a .txt to .jpg), so bail out here
+    # instead of letting it explode inside predict() with a 500 page.
     try:
         im = Image.open(path).convert("RGB")
         im.thumbnail((1000, 1000))
         im.save(path, quality=88)
     except Exception:
-        pass
+        try:
+            os.remove(path)          # don't keep junk in uploads
+        except OSError:
+            pass
+        flash("That file isn't a readable image. Try a different photo.", "warn")
+        return redirect(url_for("index"))
 
     try:
         guesses = predict(path)
     except FileNotFoundError as e:
+        # no trained model on disk yet
         flash(str(e), "warn")
+        return redirect(url_for("index"))
+    except Exception as e:
+        # anything else from tensorflow. log it for us, show something human to them.
+        print("predict failed:", e)
+        flash("Something went wrong reading that photo. Try another one.", "warn")
         return redirect(url_for("index"))
 
     best = guesses[0]
+    runner_up = guesses[1]["conf"] if len(guesses) > 1 else 0.0
+    margin = best["conf"] - runner_up
+
     info = knowledge.lookup(best["label"])
     info["confidence"] = round(best["conf"], 1)
     info["image"] = fname
@@ -162,16 +186,31 @@ def diagnose():
         {**knowledge.lookup(g["label"]), "confidence": round(g["conf"], 1)} for g in guesses[1:]
     ]
 
+    # the honesty check. two ways a result gets rejected:
+    #   low     -> nothing scored high enough, probably not a leaf we know
+    #   torn    -> top two are neck and neck, model can't decide
+    info["uncertain"] = False
+    if best["conf"] < MIN_CONFIDENCE:
+        info["uncertain"] = True
+        info["why"] = "low"
+    elif margin < MIN_MARGIN:
+        info["uncertain"] = True
+        info["why"] = "torn"
+    info["margin"] = round(margin, 1)
+
     # save the scan so the user can look back at it
-    try:
-        con = get_db(); cur = con.cursor()
-        cur.execute("""INSERT INTO scans(user_id,image,plant,disease,confidence,healthy,created)
-                       VALUES(%s,%s,%s,%s,%s,%s,%s)""",
-                    (session.get("uid"), fname, info["plant"], info["disease"],
-                     info["confidence"], 1 if info["healthy"] else 0, datetime.now()))
-        con.commit(); cur.close(); con.close()
-    except Exception as e:
-        print("couldn't save scan:", e)   # don't break the result page over this
+    # only log real diagnoses. no point filling someone's history with
+    # "not sure" entries from blurry photos or things that aren't leaves.
+    if not info["uncertain"]:
+        try:
+            con = get_db(); cur = con.cursor()
+            cur.execute("""INSERT INTO scans(user_id,image,plant,disease,confidence,healthy,created)
+                           VALUES(%s,%s,%s,%s,%s,%s,%s)""",
+                        (session.get("uid"), fname, info["plant"], info["disease"],
+                         info["confidence"], 1 if info["healthy"] else 0, datetime.now()))
+            con.commit(); cur.close(); con.close()
+        except Exception as e:
+            print("couldn't save scan:", e)   # don't break the result page over this
 
     return render_template("result.html", r=info)
 
